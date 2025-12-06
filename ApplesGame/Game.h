@@ -9,18 +9,33 @@
 
 namespace ApplesGame
 {
+
+	enum class GameSettingBits
+	{
+		IsGameInfinite = 1 << 0,
+		IsGameWithAcceleration = 1 << 1,
+		HardcoreMode = 1 << 2,
+		EasyMode = 1 << 3,
+	};
+
 	struct Game
 	{
 		Rectangle screenRect;
-		
 		Player player;
-		Apple apples[NUM_APPLES];
+		Apple* apples;
 		Rock rocks[NUM_ROCKS];
+
+		uint32_t gameMode = 0;
+		int NUM_APPLES = 20;
+
 
 		// Global game data
 		int numEatenApples = 0;
 		bool isGameFinished = false;
+		bool applesAlive[MAX_APPLES];
+
 		float timeSinceGameFinish = 0.f;
+
 
 		// Resources
 		sf::Texture playerTexture;
@@ -46,12 +61,12 @@ namespace ApplesGame
 	void UpdateGame(Game& game, float deltaTime);
 	void DrawGame(Game& game, sf::RenderWindow& window);
 	void DeinializeGame(Game& game);
-
 	void StartPlayingState(Game& game);
 	void UpdatePlayingState(Game& game, float deltaTime);
-
 	void StartGameoverState(Game& game);
 	void UpdateGameoverState(Game& game, float deltaTime);
+
+
 }
 
 

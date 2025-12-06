@@ -3,6 +3,8 @@
 
 namespace ApplesGame
 {
+
+
 	void StartPlayingState(Game& game)
 	{
 		SetPlayerPosition(game.player, { SCREEN_WIDTH / 2.f, SCREEN_HEIGHT / 2.f });
@@ -10,7 +12,7 @@ namespace ApplesGame
 		SetPlayerDirection(game.player, PlayerDirection::Right);
 
 		// Init apples
-		for (int i = 0; i < NUM_APPLES; ++i)
+		for (int i = 0; i < game.NUM_APPLES; ++i)
 		{
 			SetApplePosition(game.apples[i], GetRandomPositionInRectangle(game.screenRect));
 		}
@@ -50,13 +52,43 @@ namespace ApplesGame
 		UpdatePlayer(game.player, deltaTime);
 
 		// Find player collisions with apples
-		for (int i = 0; i < NUM_APPLES; ++i)
+		for (int i = 0; i < game.NUM_APPLES; ++i)
 		{
+
+			if (!game.applesAlive[i])
+				continue;
+
 			if (DoShapesCollide(GetPlayerCollider(game.player), GetAppleCollider(game.apples[i])))
 			{
-				SetApplePosition(game.apples[i], GetRandomPositionInRectangle(game.screenRect));
+
+				bool isInfiniteApples = game.gameMode & static_cast <uint32_t>(GameSettingBits::IsGameInfinite);
+
+
+				if (isInfiniteApples)
+				{
+					SetApplePosition(game.apples[i], GetRandomPositionInRectangle(game.screenRect));
+				}
+
+				else
+				{
+					game.applesAlive[i] = false;
+				}
+
+
 				++game.numEatenApples;
-				SetPlayerSpeed(game.player, GetPlayerSpeed(game.player) + ACCELERATION);
+
+				bool IsAcceleration = game.gameMode & static_cast <uint32_t>(GameSettingBits::IsGameWithAcceleration);
+
+
+				if (IsAcceleration)
+				{
+					SetPlayerSpeed(game.player, GetPlayerSpeed(game.player) + ACCELERATION);
+				}
+				else
+				{
+					SetPlayerSpeed(game.player, GetPlayerSpeed(game.player));
+				}
+
 				game.eatAppleSound.play();
 				game.scoreText.setString("Apples eaten: " + std::to_string(game.numEatenApples));
 			}
@@ -78,6 +110,7 @@ namespace ApplesGame
 		}
 	}
 
+
 	void StartGameoverState(Game& game)
 	{
 		game.isGameFinished = true;
@@ -85,6 +118,7 @@ namespace ApplesGame
 		game.gameOverSound.play();
 		game.gameOverScoreText.setString("Your scores: " + std::to_string(game.numEatenApples));
 	}
+
 
 	void UpdateGameoverState(Game& game, float deltaTime)
 	{
@@ -112,14 +146,43 @@ namespace ApplesGame
 		assert(game.gameOverSoundBuffer.loadFromFile(RESOURCES_PATH + "\\Death.wav"));
 		assert(game.font.loadFromFile(RESOURCES_PATH + "\\Fonts\\Roboto-Bold.ttf"));
 
+
+		game.gameMode = 0;
+
+		game.gameMode |= static_cast <uint32_t>(GameSettingBits::HardcoreMode);
+		game.gameMode |= static_cast <uint32_t>(GameSettingBits::IsGameWithAcceleration);
+		game.gameMode |= static_cast <uint32_t>(GameSettingBits::IsGameInfinite);
+
+
+		bool isHardcore = game.gameMode & static_cast <uint32_t> (GameSettingBits::HardcoreMode);
+
+
+		if (!isHardcore)
+		{
+			game.NUM_APPLES = 20;
+
+		}
+		else if (isHardcore)
+		{
+			game.NUM_APPLES = 50;
+		}
+		else
+		{
+			game.NUM_APPLES = 20;
+		}
+
+
+
+		game.apples = new Apple[game.NUM_APPLES];
 		// Init game objects
 		game.screenRect = { 0.f, 0.f, SCREEN_WIDTH, SCREEN_HEIGHT };
 
 		InitPlayer(game.player, game);
 
 		// Init apples
-		for (int i = 0; i < NUM_APPLES; ++i)
+		for (int i = 0; i < game.NUM_APPLES; ++i)
 		{
+			game.applesAlive[i] = true;
 			InitApple(game.apples[i], game);
 		}
 
@@ -160,7 +223,7 @@ namespace ApplesGame
 		game.gameOverScoreText.setCharacterSize(30);
 		game.gameOverScoreText.setFillColor(sf::Color::White);
 		game.gameOverScoreText.setString("Your score: " + std::to_string(game.numEatenApples));
-		game.gameOverScoreText.setPosition(SCREEN_WIDTH / 2.f - game.controlsHintText.getGlobalBounds().width / 4.f , SCREEN_HEIGHT / 2.f + 50.f);
+		game.gameOverScoreText.setPosition(SCREEN_WIDTH / 2.f - game.controlsHintText.getGlobalBounds().width / 4.f, SCREEN_HEIGHT / 2.f + 50.f);
 
 		StartPlayingState(game);
 	}
@@ -182,12 +245,17 @@ namespace ApplesGame
 	{
 		// Draw background
 		window.draw(game.background);
-		
+
 		// Draw game objects
 		DrawPlayer(game.player, window);
-		for (int i = 0; i < NUM_APPLES; ++i)
+
+
+
+		for (int i = 0; i < game.NUM_APPLES; ++i)
 		{
-			DrawApple(game.apples[i], window);
+			if (game.applesAlive[i]) {
+				DrawApple(game.apples[i], window);
+			}
 		}
 
 		for (int i = 0; i < NUM_ROCKS; ++i)
@@ -210,6 +278,7 @@ namespace ApplesGame
 
 	void DeinializeGame(Game& game)
 	{
-
+		delete[]game.apples;
+		game.apples = nullptr;
 	}
 }
