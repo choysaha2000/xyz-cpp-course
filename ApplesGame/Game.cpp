@@ -49,6 +49,12 @@ namespace ApplesGame
 			SetPlayerDirection(game.player, PlayerDirection::Down);
 		}
 
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::P))
+		{
+			RestartGame(game, deltaTime);
+		}
+
+
 		UpdatePlayer(game.player, deltaTime);
 
 		// Find player collisions with apples
@@ -113,6 +119,9 @@ namespace ApplesGame
 
 	void StartGameoverState(Game& game)
 	{
+
+		const std::string PLAYER_NAME = "Player";
+		game.recordsTable[PLAYER_NAME] = game.numEatenApples;
 		game.isGameFinished = true;
 		game.timeSinceGameFinish = 0.f;
 		game.gameOverSound.play();
@@ -122,6 +131,7 @@ namespace ApplesGame
 
 	void UpdateGameoverState(Game& game, float deltaTime)
 	{
+
 		if (game.timeSinceGameFinish <= PAUSE_LENGTH)
 		{
 			game.timeSinceGameFinish += deltaTime;
@@ -136,6 +146,66 @@ namespace ApplesGame
 		}
 	}
 
+	std::string GetLeaderboardString(const std::unordered_map<std::string, int>& records)
+	{
+		// Переносим в мультимап (очки ? имя) для сортировки
+		std::multimap<int, std::string> sortedRecords;
+		for (const auto& item : records)
+		{
+			sortedRecords.insert({ item.second, item.first });
+		}
+
+		std::string result = "===== LEADERBOARD =====\n";
+
+		int position = 1;
+		// Идём в обратном порядке (от большего к меньшему)
+		for (auto it = sortedRecords.rbegin(); it != sortedRecords.rend() && position <= 5; ++it, ++position)
+		{
+			int score = it->first;
+			const std::string& name = it->second;
+
+			// Форматируем строку с точками
+			std::string line = std::to_string(position) + ". " + name;
+
+
+
+			auto dotsNeeded = 20 - line.length(); // примерно для выравнивания
+			for (int i = 0; i < dotsNeeded; ++i)
+				line += ".";
+			line += " " + std::to_string(score);
+
+			result += line + "\n";
+		}
+
+		result += "=======================\n";
+		return result;
+	}
+
+
+	void RestartGame(Game& game, float deltaTime)
+	{
+		InitPlayer(game.player, game);
+		StartGameoverState(game);
+		game.numEatenApples = 0;
+	}
+
+	void InitializeLeaderBoard(Game& game)
+	{
+		game.recordsTable.clear();
+
+		std::vector<std::string> names = {
+			"Alice", "Bob", "Carol", "Dave", "Eve",
+			"Frank", "Grace", "Henry", "Iris", "Jack"
+		};
+
+		for (const auto& name : names)
+		{
+			int randomScore = 1 + (rand() % 30);
+			game.recordsTable[name] = randomScore;
+		}
+	}
+
+
 	void InitGame(Game& game)
 	{
 		// Load resources
@@ -147,8 +217,9 @@ namespace ApplesGame
 		assert(game.font.loadFromFile(RESOURCES_PATH + "\\Fonts\\Roboto-Bold.ttf"));
 
 
-		game.gameMode = 0;
+		InitializeLeaderBoard(game);
 
+		game.gameMode = 0;
 		game.gameMode |= static_cast <uint32_t>(GameSettingBits::HardcoreMode);
 		game.gameMode |= static_cast <uint32_t>(GameSettingBits::IsGameWithAcceleration);
 		game.gameMode |= static_cast <uint32_t>(GameSettingBits::IsGameInfinite);
@@ -213,6 +284,14 @@ namespace ApplesGame
 		game.controlsHintText.setString("Use arrows to move, ESC to exit");
 		game.controlsHintText.setPosition(SCREEN_WIDTH - game.controlsHintText.getGlobalBounds().width - 20.f, 10.f);
 
+		game.controlsHintText2.setFont(game.font);
+		game.controlsHintText2.setCharacterSize(20);
+		game.controlsHintText2.setFillColor(sf::Color::Blue);
+		game.controlsHintText2.setString("Press P to restart game");
+		game.controlsHintText2.setPosition(SCREEN_WIDTH - game.controlsHintText2.getGlobalBounds().width - 20.f,
+			SCREEN_HEIGHT - game.controlsHintText2.getGlobalBounds().height - 20.f);
+
+
 		game.gameOverText.setFont(game.font);
 		game.gameOverText.setCharacterSize(100);
 		game.gameOverText.setFillColor(sf::Color::White);
@@ -225,6 +304,10 @@ namespace ApplesGame
 		game.gameOverScoreText.setString("Your score: " + std::to_string(game.numEatenApples));
 		game.gameOverScoreText.setPosition(SCREEN_WIDTH / 2.f - game.controlsHintText.getGlobalBounds().width / 4.f, SCREEN_HEIGHT / 2.f + 50.f);
 
+
+
+
+
 		StartPlayingState(game);
 	}
 
@@ -235,6 +318,7 @@ namespace ApplesGame
 		{
 			UpdatePlayingState(game, deltaTime);
 		}
+
 		else
 		{
 			UpdateGameoverState(game, deltaTime);
@@ -268,10 +352,25 @@ namespace ApplesGame
 		{
 			window.draw(game.scoreText);
 			window.draw(game.controlsHintText);
+			window.draw(game.controlsHintText2);
 		}
+
+
 		else
+
 		{
+
+
+			std::string leaderboardText = GetLeaderboardString(game.recordsTable);
+			game.gameOverText.setString(leaderboardText);
+			game.gameOverText.setCharacterSize(18);
+			game.gameOverText.setFont(game.font);
+			game.gameOverText.setPosition(50, 100);
+
+
+
 			window.draw(game.gameOverText);
+
 			window.draw(game.gameOverScoreText);
 		}
 	}

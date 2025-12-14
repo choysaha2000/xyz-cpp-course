@@ -6,6 +6,8 @@
 #include "Player.h"
 #include "Apple.h"
 #include "Rock.h"
+#include <map>
+#include <unordered_map>
 
 namespace ApplesGame
 {
@@ -24,16 +26,17 @@ namespace ApplesGame
 		Player player;
 		Apple* apples;
 		Rock rocks[NUM_ROCKS];
-
 		uint32_t gameMode = 0;
 		int NUM_APPLES = 20;
+
+
+		std::unordered_map<std::string, int> recordsTable;
 
 
 		// Global game data
 		int numEatenApples = 0;
 		bool isGameFinished = false;
 		bool applesAlive[MAX_APPLES];
-
 		float timeSinceGameFinish = 0.f;
 
 
@@ -55,7 +58,10 @@ namespace ApplesGame
 		sf::Text controlsHintText;
 		sf::Text gameOverText;
 		sf::Text gameOverScoreText;
+		sf::Text controlsHintText2;
 	};
+
+
 
 	void InitGame(Game& game);
 	void UpdateGame(Game& game, float deltaTime);
@@ -65,8 +71,9 @@ namespace ApplesGame
 	void UpdatePlayingState(Game& game, float deltaTime);
 	void StartGameoverState(Game& game);
 	void UpdateGameoverState(Game& game, float deltaTime);
-
-
+	std::string GetLeaderboardString(const std::unordered_map<std::string, int>& records);
+	void RestartGame(Game& game, float deltaTime);
+	void InitializeLeaderBoard(Game& game);
 }
 
 
