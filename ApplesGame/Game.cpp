@@ -381,3 +381,4 @@ namespace ApplesGame
 		game.apples = nullptr;
 	}
 }
+

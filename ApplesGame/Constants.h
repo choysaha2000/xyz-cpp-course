@@ -16,7 +16,8 @@ namespace ApplesGame
 	const float PAUSE_LENGTH = 3.f;
 	const int NUM_ROCKS = 10;
 	const float ROCK_SIZE = 15.f;
-
+	const int dotsNeed = 20;
+	const int ScorePlayers = 30;
 
 }
 

@@ -75,5 +75,3 @@ namespace ApplesGame
 	void RestartGame(Game& game, float deltaTime);
 	void InitializeLeaderBoard(Game& game);
 }
-
-
