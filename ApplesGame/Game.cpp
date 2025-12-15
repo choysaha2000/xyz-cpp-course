@@ -139,7 +139,7 @@ namespace ApplesGame
 		}
 		else
 		{
-			// Reset backgound
+			
 			game.background.setFillColor(sf::Color::Black);
 
 			StartPlayingState(game);
@@ -148,7 +148,7 @@ namespace ApplesGame
 
 	std::string GetLeaderboardString(const std::unordered_map<std::string, int>& records)
 	{
-		// Переносим в мультимап (очки ? имя) для сортировки
+	
 		std::multimap<int, std::string> sortedRecords;
 		for (const auto& item : records)
 		{
@@ -158,18 +158,18 @@ namespace ApplesGame
 		std::string result = "===== LEADERBOARD =====\n";
 
 		int position = 1;
-		// Идём в обратном порядке (от большего к меньшему)
+	
 		for (auto it = sortedRecords.rbegin(); it != sortedRecords.rend() && position <= 5; ++it, ++position)
 		{
 			int score = it->first;
 			const std::string& name = it->second;
 
-			// Форматируем строку с точками
+		
 			std::string line = std::to_string(position) + ". " + name;
 
 
 
-			auto dotsNeeded = 20 - line.length(); // примерно для выравнивания
+			auto dotsNeeded = 20 - line.length(); 
 			for (int i = 0; i < dotsNeeded; ++i)
 				line += ".";
 			line += " " + std::to_string(score);
