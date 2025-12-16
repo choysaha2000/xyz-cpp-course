@@ -169,7 +169,7 @@ namespace ApplesGame
 
 
 
-			auto dotsNeeded = 20 - line.length(); 
+			auto dotsNeeded = dotsNeed - line.length();
 			for (int i = 0; i < dotsNeeded; ++i)
 				line += ".";
 			line += " " + std::to_string(score);
@@ -200,7 +200,7 @@ namespace ApplesGame
 
 		for (const auto& name : names)
 		{
-			int randomScore = 1 + (rand() % 30);
+			int randomScore = 1 + (rand() % ScorePlayers);
 			game.recordsTable[name] = randomScore;
 		}
 	}
@@ -284,12 +284,12 @@ namespace ApplesGame
 		game.controlsHintText.setString("Use arrows to move, ESC to exit");
 		game.controlsHintText.setPosition(SCREEN_WIDTH - game.controlsHintText.getGlobalBounds().width - 20.f, 10.f);
 
-		game.controlsHintText2.setFont(game.font);
-		game.controlsHintText2.setCharacterSize(20);
-		game.controlsHintText2.setFillColor(sf::Color::Blue);
-		game.controlsHintText2.setString("Press P to restart game");
-		game.controlsHintText2.setPosition(SCREEN_WIDTH - game.controlsHintText2.getGlobalBounds().width - 20.f,
-			SCREEN_HEIGHT - game.controlsHintText2.getGlobalBounds().height - 20.f);
+		game.controlRestart.setFont(game.font);
+		game.controlRestart.setCharacterSize(20);
+		game.controlRestart.setFillColor(sf::Color::Blue);
+		game.controlRestart.setString("Press P to restart game");
+		game.controlRestart.setPosition(SCREEN_WIDTH - game.controlsHintText2.getGlobalBounds().width - 20.f,
+			SCREEN_HEIGHT - game.controlRestart.getGlobalBounds().height - 20.f);
 
 
 		game.gameOverText.setFont(game.font);

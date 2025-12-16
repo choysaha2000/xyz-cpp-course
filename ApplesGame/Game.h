@@ -58,7 +58,7 @@ namespace ApplesGame
 		sf::Text controlsHintText;
 		sf::Text gameOverText;
 		sf::Text gameOverScoreText;
-		sf::Text controlsHintText2;
+		sf::Text controlRestart;
 	};
 
 
