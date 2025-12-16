@@ -288,7 +288,7 @@ namespace ApplesGame
 		game.controlRestart.setCharacterSize(20);
 		game.controlRestart.setFillColor(sf::Color::Blue);
 		game.controlRestart.setString("Press P to restart game");
-		game.controlRestart.setPosition(SCREEN_WIDTH - game.controlsHintText2.getGlobalBounds().width - 20.f,
+		game.controlRestart.setPosition(SCREEN_WIDTH - game.controlRestart.getGlobalBounds().width - 20.f,
 			SCREEN_HEIGHT - game.controlRestart.getGlobalBounds().height - 20.f);
 
 
@@ -352,7 +352,7 @@ namespace ApplesGame
 		{
 			window.draw(game.scoreText);
 			window.draw(game.controlsHintText);
-			window.draw(game.controlsHintText2);
+			window.draw(game.controlRestart);
 		}
 
 
